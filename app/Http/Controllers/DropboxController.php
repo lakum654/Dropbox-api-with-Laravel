@@ -16,7 +16,7 @@ class DropboxController extends Controller
 {
     public $apiKey = '2afqnbp4jd93h5n';
     public $appSecret = 'osdarkrp2k6gi0h';
-    public $authToken = 'sl.Av06gJDA5BVUc1r3mB3SMSSntwh3ZSHZhya5k7trGYjOgwPoiE0DveldWLrdSe5Zu_ysj7Z_Mjdvlk3803mLmktXPgphkwf9WSVayuHMxxO-c_Uzd9GIIskXeYis3JHJL1sZXp8AOSI';
+    public $authToken = 'sl.AwBpaADCh48zw0QiTwU9Fc52NLPyoLo-wdtIHJ6Xk693NXD-Faygp8AYHhf-yUwI-taLmf9hIFlVNOXIvGQnfNpmhKaOgQ9lUbXlS9PciVpiPuDQHF5iAk-Gac18wrTdGgrIu_2jZ7U';
 
    public function index(){
     $parameters = array('path' => '','include_deleted' => false,'recursive' => false);
@@ -38,16 +38,19 @@ class DropboxController extends Controller
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
     
     $result = curl_exec($ch);
-    
     $files = json_decode($result, true);    
     curl_close($ch);
-    return view('dropbox.index',compact('files'));
+    if(!empty($files)){
+        return view('dropbox.index',compact('files'));
+    }else{
+        echo "no File Found";
+    }
    }
 
    public function download(Request $request)
    {
-     $out_filepath = $request->file;
-     $in_filepath = $request->file;   
+    $out_filepath = $request->file;
+    $in_filepath = $request->file;  
     $out_fp = fopen($out_filepath, 'w+');
     if ($out_fp === FALSE)
         {
@@ -60,7 +63,7 @@ class DropboxController extends Controller
     $header_array = array(
         'Authorization: Bearer ' . $this->authToken,
         'Content-Type:',
-        'Dropbox-API-Arg: {"path":"' . $in_filepath . '"}'
+        'Dropbox-API-Arg: {"path":"/'. $in_filepath . '"}'
     );
 
     $ch = curl_init();
@@ -69,7 +72,8 @@ class DropboxController extends Controller
     curl_setopt($ch, CURLOPT_POST, TRUE);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $header_array);
     curl_setopt($ch, CURLOPT_FILE, $out_fp);
-
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
     $metadata = null;
     curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $header) use (&$metadata)
         {
@@ -91,43 +95,49 @@ class DropboxController extends Controller
 
     curl_close($ch);
     fclose($out_fp);
-    $request->session()->put('file',$request->file);
+
+    //return($metadata);
+    $request->Session()->put('file',$request->file);
     return back();
    }
 
-   public function read(Request $request)
-   {
-$reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader('Xlsx');
+public function read(Request $request)
+{
+$isExists = file_exists('dropbox/'.$request->file);
+if($isExists){
+    unlink('dropbox/'.$request->file);
+}
+    //https://www.javaer101.com/en/article/12556777.html
+$fileName = $request->file;       
+$fileType = \PhpOffice\PhpSpreadsheet\IOFactory::identify($fileName);        
+$reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($fileType);
 $reader->setReadDataOnly(TRUE);
 
+$spreadsheet = $reader->load($fileName);
 
-$reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+$worksheet = $spreadsheet->getActiveSheet();
+$highestRow = $worksheet->getHighestRow(); // e.g. 10
+$highestColumn = $worksheet->getHighestColumn(); // e.g 'F'
+$highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn); // e.g. 5
+$request->Session()->forget('file');
+return view('dropbox.read',compact('highestRow','highestColumn','highestColumnIndex','worksheet'));
+}
 
-
-$spreadsheet = $reader->load('hello.xlsx');
-
-$sheetData = $spreadsheet->getActiveSheet()->toArray();
-
-// if (!empty($sheetData)) {
-//     for ($i=1; $i<count($sheetData); $i++) {
-//         $name = $sheetData[$i][1];
-//         $email = $sheetData[$i][2];
-//     }
-// }
-
-
-   
-    }
-
-public function upload()
+public function upload(Request $request)
 {
-$path = public_path('sarthi.xlsx');    
+if($request->hasFile('file')){
+$fileName = substr($request->file->getClientOriginalName(),0,10).'.'.$request->file->extension(); 
+$request->file->move(public_path('dropbox'), $fileName);
+}else{
+    return "Please Select a File";
+}
+$path = public_path('dropbox/'.$fileName);    
 $fp = fopen($path, 'rb');
 $size = filesize($path);
 
 $cheaders = array('Authorization: Bearer '.$this->authToken,
                   'Content-Type: application/octet-stream',
-                  'Dropbox-API-Arg: {"path":"test'.$path.'", "mode":"add"}');
+                  'Dropbox-API-Arg: {"path":"/'.basename($path).'","mode":"add"}');
 
 $ch = curl_init('https://content.dropboxapi.com/2/files/upload');
 curl_setopt($ch, CURLOPT_HTTPHEADER, $cheaders);
@@ -143,5 +153,7 @@ $response = curl_exec($ch);
 echo $response;
 curl_close($ch);
 fclose($fp);
+return back();
+//remove file from dropbox folder
 }
-   }
+}

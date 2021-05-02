@@ -14,7 +14,7 @@
                 <select name="file" class="form-control">
                     <option>Select File</option>
                     @foreach($files['entries'] as $val)
-                       <option>{{ $val['name'] }}</option>
+                       <option value="{{ $val['name'] }}">{{ $val['name'] }}- {{ $val['size'] }} </option>
                     @endforeach
                 </select>
               </div>
@@ -39,7 +39,7 @@
         </form>
 
         @if(Session::has('file'))
-            <a href="{{ url('dropbox/read/'.Session::get('file')) }}">Read File</a>
+            File Download Successfully <a href="{{ url('dropbox/read/'.Session::get('file')) }}">Read..</a>
         @endif
        </div>
     </body>

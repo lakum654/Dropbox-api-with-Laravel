@@ -11,11 +11,13 @@
     @for($row = 1; $row <= $highestRow; ++$row)
    <tr>
     @for ($col = 1; $col <= $highestColumnIndex; ++$col)
+       {{--  @if($worksheet->getCellByColumnAndRow($col, $row)->getValue() != '')  --}}
         @if($row == 1)
         <th>{{ $worksheet->getCellByColumnAndRow($col, $row)->getValue() }}</th>
         @else
         <td>{{ $worksheet->getCellByColumnAndRow($col, $row)->getValue() }}</td>
-        @endif
+        @endif           
+        {{--  @endif  --}}
     @endfor
     </tr>
 @endfor
