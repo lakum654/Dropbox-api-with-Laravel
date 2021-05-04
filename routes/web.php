@@ -12,7 +12,9 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+/*
+ 
+*/
 Route::get('/', function () {
     return view('welcome');
 });
@@ -22,3 +24,8 @@ Route::any('dropbox/upload','DropboxController@upload');
 Route::post('dropbox/download','DropboxController@download');
 Route::get('dropbox/write','DropboxController@write');
 Route::get('dropbox/read/{file}','DropboxController@read');
+
+Route::get('xml','XmlController@index');
+Route::get('xml/create','XmlController@create');
+
+Route::get('xml/db_users','XmlController@db_users');

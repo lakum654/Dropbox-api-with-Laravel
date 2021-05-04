@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<bookstore>
+  <books id="1">
+    <id>1</id>
+    <name>PHP</name>
+    <price>100</price>
+    <author>John Dov</author>
+  </books>
+  <books id="2">
+    <id>2</id>
+    <name>Laravel</name>
+    <price>200</price>
+    <author>Toyllor Otwell</author>
+  </books>
+  <books id="3">
+    <id>3</id>
+    <name>Javascript</name>
+    <price>350</price>
+    <author>Denish Riches</author>
+  </books>
+  <books id="4">
+    <id>4</id>
+    <name>Xml</name>
+    <price>150</price>
+    <author>John</author>
+  </books>
+  <books id="5">
+    <id>5</id>
+    <name>HTML</name>
+    <price>230</price>
+    <author>Sundar</author>
+  </books>
+  <books id="6">
+    <id>6</id>
+    <name>CSS</name>
+    <price>210</price>
+    <author>Jenny</author>
+  </books>
+</bookstore>

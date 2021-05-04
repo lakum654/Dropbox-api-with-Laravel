@@ -16,7 +16,7 @@ class DropboxController extends Controller
 {
     public $apiKey = '2afqnbp4jd93h5n';
     public $appSecret = 'osdarkrp2k6gi0h';
-    public $authToken = 'sl.AwBpaADCh48zw0QiTwU9Fc52NLPyoLo-wdtIHJ6Xk693NXD-Faygp8AYHhf-yUwI-taLmf9hIFlVNOXIvGQnfNpmhKaOgQ9lUbXlS9PciVpiPuDQHF5iAk-Gac18wrTdGgrIu_2jZ7U';
+    public $authToken = 'sl.AwF3QBfJ8pEsc3c5aPQGN7plSycCYr5U9GAsLrs5aBE1QjVx0dvffUKVU1Njm1ALmLzmC8gbCXP_JKSlGDYGaoqoqfw8Wk2m36a2aZHJXW3B592rjqjZwOs31Yol3SnLln2Y1gV2ygM';
 
    public function index(){
     $parameters = array('path' => '','include_deleted' => false,'recursive' => false);
@@ -57,7 +57,6 @@ class DropboxController extends Controller
         echo "fopen error; can't open $out_filepath\n";
         return (NULL);
         }
-
     $url = 'https://content.dropboxapi.com/2/files/download';
 
     $header_array = array(
@@ -65,9 +64,7 @@ class DropboxController extends Controller
         'Content-Type:',
         'Dropbox-API-Arg: {"path":"/'. $in_filepath . '"}'
     );
-
     $ch = curl_init();
-
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_POST, TRUE);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $header_array);
